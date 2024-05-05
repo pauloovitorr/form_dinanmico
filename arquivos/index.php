@@ -105,8 +105,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                     <div class="pai_multi">
                         <input type="radio" disabled>
-                        <input type="text" name="rad1" placeholder="Digite a opção..." required>
+                        <input type="text" name="rad1" id="rad1" placeholder="Digite a opção..." >
                     </div>
+
+                    <div class="pai_check">
+                        <input type="checkbox" disabled>
+                        <input type="text" name="check1" id="check1" placeholder="Digite a opção..." >
+                    </div>
+
+                    <div class="pai_select">
+                        <p>1 - </p>
+                        <input type="text" name="select1" id="select1" placeholder="Digite a opção..." >
+                    </div>
+
+
 
                     <button id="add"> <i class="fa-solid fa-plus"></i> Adicionar</button>
                 </div>
@@ -240,21 +252,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                 // config Multiplos
 
-                if(valor_input == 6 ||valor_input == 7 || valor_input == 8 ){
+                if (valor_input == 6 || valor_input == 7 || valor_input == 8) {
                     $('.dados_input').css('display', 'block')
-                }else{
+
+                    if(valor_input == 6){
+                        $('.pai_multi').css('display', 'block')
+                        $('.pai_multi').find('#rad1').attr('required', true)
+
+                        $('.pai_check').css('display', 'none')
+                        $('.pai_select').css('display', 'none')
+                    }else{
+                        $('.pai_multi').css('display', 'none')
+                        $('.pai_multi').find('#rad1').attr('required', false)
+                    }
+
+
+                    if(valor_input == 7){
+                        $('.pai_check').css('display', 'block')
+                        $('.pai_check').find('#check1').attr('required', true)
+
+                        $('.pai_multi').css('display', 'none')
+                        $('.pai_select').css('display', 'none')
+                    }else{
+                        $('.pai_check').css('display', 'none')
+                        $('.pai_check').find('#check1').attr('required', false)
+                    }
+
+
+
+                    if(valor_input == 8){
+                        $('.pai_select').css('display', 'block')
+                        $('.pai_select').find('#select1').attr('required', true)
+
+                        $('.pai_multi').css('display', 'none')
+                        $('.pai_check').css('display', 'none')
+                    }else{
+                        $('.pai_select').css('display', 'none')
+                        $('.pai_select').find('#select1').attr('required', false)
+                    }
+
+
+                } else {
                     $('.dados_input').css('display', 'none')
+                    $('.pai_multi').find('#rad1').attr('required', false)
+                    $('.pai_check').find('#check1').attr('required', false)
+                    $('.pai_select').find('#select1').attr('required', false)
                 }
 
 
             })
 
+
+
+
+
+
+
+
+
+
+
+
+
+
             let cont = 2
+            let contador = 2
 
             $('#add').click(function(e) {
 
                 let valor_input = $('#inputt').val()
-                
+
                 if (valor_input == 6) {
                     e.preventDefault();
 
@@ -275,8 +342,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     div_input_mult.appendChild(text)
 
                     cont++
-                }
+                } else if (valor_input == 7) {
+                    e.preventDefault();
 
+                    let div_input_mult = document.querySelector('.pai_check');
+
+                    let radio = document.createElement('input')
+                    radio.type = 'checkbox'
+                    radio.disabled = true
+
+
+                    let text = document.createElement('input')
+                    text.type = 'text'
+                    text.name = 'check' + cont
+                    text.placeholder = 'Digite a opção...'
+                    //text.required = true
+
+                    div_input_mult.appendChild(radio)
+                    div_input_mult.appendChild(text)
+
+                    cont++
+                }
+                else if (valor_input == 8) {
+                    
+                    e.preventDefault();
+
+                    let div_input_select = document.querySelector('.pai_select');
+
+                    let p = document.createElement('p')
+                    p.innerHTML = contador + '  -'
+
+
+                    let text = document.createElement('input')
+                    text.type = 'text'
+                    text.name = 'select' + cont
+                    text.placeholder = 'Digite a opção...'
+                   
+
+                    div_input_select.appendChild(p)
+                    div_input_select.appendChild(text)
+
+                    cont++
+                    contador++
+                }
 
             });
 

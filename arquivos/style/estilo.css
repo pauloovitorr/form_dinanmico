@@ -73,3 +73,21 @@
     width: 6%;
 }
 
+.dados_input div input[type=checkbox]{
+    border: none;
+    outline: none;
+    width: 6%;
+}
+
+.dados_input div p{
+   display: inline-block;
+}
+
+.pai_multi{
+    display: none;
+}
+
+.pai_check{
+    display: none;
+}
+
