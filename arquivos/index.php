@@ -5,9 +5,9 @@ require_once('../conn.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !empty($_POST['tipo_input']) && !empty($_POST['obrig'])) {
 
-    // print_r($_POST);
+    //print_r($_POST);
 
-    // die();
+   
 
     $pergunta = $conexao->escape_string($_POST['perguntaa']);
     $tipo     = $conexao->escape_string($_POST['tipo_input']);
@@ -16,12 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !emp
     $max      = '';
     $multiplo_res = '';
 
-    //print_r($_POST);
-
+    $conexao->begin_transaction();
+try{
+    
     if ($_POST['min'] && $_POST['min']) {
         $min   = $conexao->escape_string($_POST['min']);
         $max   = $conexao->escape_string($_POST['max']);
     }
+
 
     if (!empty($_POST['mult'])) {
         $multiplo_res = $conexao->escape_string($_POST['mult']);
@@ -34,6 +36,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !emp
     $prepare_sql->bind_param('ssiiis', $pergunta, $obrig, $min, $max, $tipo, $multiplo_res);
 
     $prepare_sql->execute();
+
+    $id_pergunta = $prepare_sql->insert_id;
+
+
+    if($tipo == 6){
+        foreach($_POST as $nome => $valor){
+            if($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'check1' &&  $nome != 'select1' &&  $nome != 'min' &&  $nome != 'max'   ){
+                if($valor != ''){
+                    $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
+                    $conexao->query($sql);
+                }
+            }
+        }
+    }
+    elseif($tipo == 7){
+        foreach($_POST as $nome => $valor){
+            if($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'select1' &&  $nome != 'rad1' &&  $nome != 'min' &&  $nome != 'max'   ){
+                if($valor != ''){
+                    $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
+                    $conexao->query($sql);
+                }
+            }
+        }
+    }
+    elseif($tipo == 8){
+        foreach($_POST as $nome => $valor){
+            if($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'check1' &&  $nome != 'rad1' &&  $nome != 'min' &&  $nome != 'max' && $nome != 'mult' ){
+                if($valor != ''){
+                    $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
+                    $conexao->query($sql);
+                }
+            }
+        }
+    }
+
+
+    $conexao->commit();
+    header("Location: ".$_SERVER['PHP_SELF']);
+}
+
+catch (Exception){
+    $conexao->rollback();
+}
+
+
+
 }
 
 
@@ -67,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 <body>
 
-    <h1>Crie perguntas</h1>
+    <h1>Crie perguntas e utilize em vários formulários</h1>
 
     <div class="container">
 
@@ -77,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                 <div>
                     <label for="perguntaa">Digite sua pergunta</label> <br>
-                    <input type="text" name="perguntaa" id="perguntaa" minlength="5" required>
+                    <input type="text" name="perguntaa" id="perguntaa" minlength="3" required>
                 </div>
 
 
@@ -172,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     </div>
 
 
-    <div>
+    <div class="tabelas">
         <table>
 
             <tr>
@@ -296,21 +344,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     $('.dados_input').css('display', 'none')
                     $('.pai_multi').find('#rad1').attr('required', false)
                     $('.pai_check').find('#check1').attr('required', false)
-                    $('.pai_select').find('#select1').attr('required', false)
+                    $('.pai_select').find ('#select1').attr('required', false)
                 }
 
 
             })
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -387,15 +425,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
 
             });
-
-
-
-
-
-
-
-
-
 
         })
     </script>

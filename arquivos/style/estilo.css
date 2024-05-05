@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .config_caracteres{
@@ -90,4 +91,28 @@
 .pai_check{
     display: none;
 }
+h1{
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+.tabelas{
+    width: 50%;
+    margin: 0 auto;
+    margin-top: 100px;
+}
+
+.tabelas table{
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+.tabelas table td{
+    border-bottom: 1px solid rgba(128, 128, 128, 0.767) !important;
+    padding: 5px;
+}
+
+
 
