@@ -1,9 +1,49 @@
 <?php 
 
 
-if($_SERVER['REQUEST_METHOD'] === 'POST'  )
+require_once('../conn.php');
 
-    print_r($_POST);
+if($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !empty($_POST['tipo_input']) && !empty($_POST['obrig']) ){
+
+    $pergunta = $conexao->escape_string($_POST['perguntaa']);
+    $tipo     = $conexao->escape_string($_POST['tipo_input']);
+    $obrig    = $conexao->escape_string($_POST['obrig']);
+    $min      = '';
+    $max      = '';
+    $multiplo_res = '';
+
+    //print_r($_POST);
+
+    if($_POST['min'] && $_POST['min'] ){
+        $min   = $conexao->escape_string($_POST['min']);
+        $max   = $conexao->escape_string($_POST['max']);
+    }
+
+    if($_POST['mult']){
+        $multiplo_res = $conexao->escape_string($_POST['mult']);
+    }
+
+    $sql = "INSERT INTO perguntas (titulo, obrigatorio, min_caract, max_caract, id_input, multiplo_res) VALUES (?,?,?,?,?,? ) ";
+
+    $prepare_sql = $conexao->prepare($sql);
+
+    $prepare_sql->bind_param('ssiiis',$pergunta,$obrig,$min,$max,$tipo, $multiplo_res );
+
+    $prepare_sql->execute();
+   
+
+}
+
+
+
+if($_SERVER['REQUEST_METHOD'] === 'GET'){
+    //$sql  = 'SELECT * FROM perguntas';
+    //$dd = $conexao->query($sql);
+
+    //$dd = $dd->fetch_assoc();
+    //print_r($dd);
+}
+
 
 ?>
 
@@ -29,7 +69,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'  )
         <div>
             
             <label for="perguntaa">Digite sua pergunta</label>
-            <input type="text" name="perguntaa" id="perguntaa" minlength="5">  </br></br>
+            <input type="text" name="perguntaa" id="perguntaa" minlength="5" required>  </br></br>
 
             <label for="inputt">Tipo de input</label>
 
@@ -54,8 +94,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'  )
 
             <div>
                 <label for="">Deve ser obrigatório responder?</label>
-                <input type="radio" id="obg_s" name="obrig" value="Sim"> <label for="obg_s">Sim</label>
-                <input type="radio" id="obg_n" name="obrig" value="Não"> <label for="obg_n">Não</label>
+                <input type="radio" id="obg_s" name="obrig" value="Sim" required> <label for="obg_s">Sim</label>
+                <input type="radio" id="obg_n" name="obrig" value="Não" required> <label for="obg_n">Não</label>
             </div>
 
             <div class="config_caracteres">
@@ -69,6 +109,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'  )
                     <label for="">Máximo de caracteres?</label>
                     <input type="number" id="maxx" name="max"> 
                 </div>
+
+            </div>
+
+            <div class="lista">
+
+            <div>
+                <label for="">Usuário pode selecionar mais de uma opção?</label>
+                <input type="radio" id="lista_s" name="mult" value="Sim" required> <label for="lista_s">Sim</label>
+                <input type="radio" id="lista_n" name="mult" value="Não" required> <label for="lista_n">Não</label>
+            </div>
 
             </div>
 
@@ -117,9 +167,19 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'  )
 
                     $('#maxx').attr('min', 30)
                     $('#maxx').attr('max', 50)
-                    $('#maxx').val(25)
+                    $('#maxx').val(35)
 
                 }
+
+
+                // config Lista 
+
+                if(valor_input == 8){
+                    $('.lista').css('display', 'block')
+                }else{
+                    $('.lista').css('display', 'none')
+                }
+
 
             })
 
