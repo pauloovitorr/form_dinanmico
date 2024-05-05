@@ -11,3 +11,65 @@
 .lista{
     display: none;
 }
+
+.container{
+    border: 1px solid rgb(0, 191, 255);
+    width: 50%;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.pai_perguntas{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.pai_perguntas div{
+    width: 65%;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+
+.pai_perguntas div input,
+.pai_perguntas div select{
+    width: 85%;
+    padding: 6px;
+    border: 1px solid rgb(0, 191, 255);
+}
+
+.config_pg{
+    width: 65%;
+    margin: 0 auto;
+    margin-top: 35px;
+}
+
+.dados_input{
+    width: 100%;
+    display: none;
+}
+
+.dados_input div{
+    width: 75%;
+
+    padding: 5px;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dados_input div input[type=text]{
+    border: none;
+    border-bottom: 1px solid rgb(0, 191, 255);
+    outline: none;
+    width: 90%;
+}
+
+.dados_input div input[type=radio]{
+    border: none;
+    outline: none;
+    width: 6%;
+}
+
