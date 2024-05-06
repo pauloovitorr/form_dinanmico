@@ -5,16 +5,12 @@ require_once('../conn.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !empty($_POST['tipo_input']) && !empty($_POST['obrig'])) {
 
-    //print_r($_POST);
-
-   
-
     $pergunta = $conexao->escape_string($_POST['perguntaa']);
     $tipo     = $conexao->escape_string($_POST['tipo_input']);
     $obrig    = $conexao->escape_string($_POST['obrig']);
     $min      = '';
     $max      = '';
-    $multiplo_res = '';
+    $multiplo_res = 'Não';
 
     $conexao->begin_transaction();
 try{
@@ -212,43 +208,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
             </div>
 
-            <div>
-                <button type="submit">Cadastrar</button>
+            <div style="width:15%; margin: 0 auto">
+                <button class="btn_perg" type="submit">Cadastrar</button>
             </div>
 
         </form>
     </div>
 
 
-    <div class="tabelas">
-        <table>
+    <div class="tabelas container">
+    
+    <?php
+        if ($lista_perguntas->num_rows > 0) {
+            echo '<h2>'. 'Lista de perguntas' .'</h2>';
+            echo '<table>';
+            echo '<tr>';
+            echo '<th>Pergunta</th>';
+            echo '<th>Tipo</th>';
+            echo '<th>Resposta multipla</th>';
+            echo '<th>Obrigatório</th>';
+            echo '<th>Mín caracteres</th>';
+            echo '<th>Máx caracteres</th>';
+            echo '</tr>';
 
-            <tr>
-                <th>Pergunta</th>
-                <th>Tipo</th>
-                <th>Obrigatório</th>
-                <th>Mín caracteres</th>
-                <th>Máx caracteres</th>
-            </tr>
+            while ($perg = $lista_perguntas->fetch_assoc()) {
 
-            <?php
+                // print_r($perg);
 
-            if ($lista_perguntas->num_rows > 0) {
-
-                while ($perg = $lista_perguntas->fetch_assoc()) {
-                    echo '<tr>';
-                    echo '<td>' . $perg['titulo']  . '</td>';
-                    echo '<td>' . $perg['tipo']  . '</td>';
-                    echo '<td>' . $perg['obrigatorio']  . '</td>';
-                    echo '<td>' . $perg['min_caract']  . '</td>';
-                    echo '<td>' . $perg['max_caract']  . '</td>';
-                    echo '</tr>';
-                }
+                // die();
+    
+                echo '<tr>';
+                echo '<td>' . $perg['titulo'] . '</td>';
+                echo '<td>' . $perg['tipo'] . '</td>';
+                echo '<td>' . $perg['multiplo_res']  . '</td>';
+                echo '<td>' . $perg['obrigatorio']  . '</td>';
+                echo '<td>' . ($perg['min_caract']== 0 ? 'Não possui': $perg['obrigatorio']) . '</td>';
+                echo '<td>' . ($perg['max_caract']== 0 ? 'Não possui': $perg['obrigatorio']). '</td>';
+                echo '</tr>';
             }
 
-            ?>
+            echo '</table>';
+        }else{
+            echo '<h2>'. 'Crie suas perguntas' .'</h2>';
+        }
+        ?>
 
-        </table>
+
     </div>
 
 
