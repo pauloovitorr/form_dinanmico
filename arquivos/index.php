@@ -558,9 +558,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                             let div_container = document.querySelector('.dados_inputt')
 
-                            let filho = div_container.querySelector('.input_radio')
+                            
+                            let filho = div_container.querySelectorAll('.input_radio')
 
-                            if(!filho){
+                            
+
+                                filho.forEach(function(elemento) {
+                                    elemento.parentNode.removeChild(elemento);
+                                });
+
+                
+
                                 for(let i of res[1]){
 
                                     div = document.createElement('div')
@@ -582,7 +590,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                     }
                                     div_container.appendChild(div)
                                     }
-                            }
+                            
                             
 
                         }
