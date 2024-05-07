@@ -13,73 +13,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !emp
     $multiplo_res = 'Não';
 
     $conexao->begin_transaction();
-try{
-    
-    if ($_POST['min'] && $_POST['min']) {
-        $min   = $conexao->escape_string($_POST['min']);
-        $max   = $conexao->escape_string($_POST['max']);
-    }
+    try {
+
+        if ($_POST['min'] && $_POST['min']) {
+            $min   = $conexao->escape_string($_POST['min']);
+            $max   = $conexao->escape_string($_POST['max']);
+        }
 
 
-    if (!empty($_POST['mult'])) {
-        $multiplo_res = $conexao->escape_string($_POST['mult']);
-    }
+        if (!empty($_POST['mult'])) {
+            $multiplo_res = $conexao->escape_string($_POST['mult']);
+        }
 
-    $sql = "INSERT INTO perguntas (titulo, obrigatorio, min_caract, max_caract, id_input, multiplo_res) VALUES (?,?,?,?,?,? ) ";
+        $sql = "INSERT INTO perguntas (titulo, obrigatorio, min_caract, max_caract, id_input, multiplo_res) VALUES (?,?,?,?,?,? ) ";
 
-    $prepare_sql = $conexao->prepare($sql);
+        $prepare_sql = $conexao->prepare($sql);
 
-    $prepare_sql->bind_param('ssiiis', $pergunta, $obrig, $min, $max, $tipo, $multiplo_res);
+        $prepare_sql->bind_param('ssiiis', $pergunta, $obrig, $min, $max, $tipo, $multiplo_res);
 
-    $prepare_sql->execute();
+        $prepare_sql->execute();
 
-    $id_pergunta = $prepare_sql->insert_id;
+        $id_pergunta = $prepare_sql->insert_id;
 
 
-    if($tipo == 6){
-        foreach($_POST as $nome => $valor){
-            if($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'check1' &&  $nome != 'select1' &&  $nome != 'min' &&  $nome != 'max'   ){
-                if($valor != ''){
-                    $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
-                    $conexao->query($sql);
+        if ($tipo == 6) {
+            foreach ($_POST as $nome => $valor) {
+                if ($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'check1' &&  $nome != 'select1' &&  $nome != 'min' &&  $nome != 'max') {
+                    if ($valor != '') {
+                        $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
+                        $conexao->query($sql);
+                    }
+                }
+            }
+        } elseif ($tipo == 7) {
+            foreach ($_POST as $nome => $valor) {
+                if ($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'select1' &&  $nome != 'rad1' &&  $nome != 'min' &&  $nome != 'max') {
+                    if ($valor != '') {
+                        $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
+                        $conexao->query($sql);
+                    }
+                }
+            }
+        } elseif ($tipo == 8) {
+            foreach ($_POST as $nome => $valor) {
+                if ($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'check1' &&  $nome != 'rad1' &&  $nome != 'min' &&  $nome != 'max' && $nome != 'mult') {
+                    if ($valor != '') {
+                        $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
+                        $conexao->query($sql);
+                    }
                 }
             }
         }
+
+
+        $conexao->commit();
+        header("Location: " . $_SERVER['PHP_SELF']);
+    } catch (Exception) {
+        $conexao->rollback();
     }
-    elseif($tipo == 7){
-        foreach($_POST as $nome => $valor){
-            if($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'select1' &&  $nome != 'rad1' &&  $nome != 'min' &&  $nome != 'max'   ){
-                if($valor != ''){
-                    $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
-                    $conexao->query($sql);
-                }
-            }
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cod_pergunta'])) {
+    $cod = $_POST['cod_pergunta'];
+
+    $sql = "SELECT p.perguntas_id, p.titulo, p.obrigatorio, p.min_caract, p.max_caract, p.id_input, p.multiplo_res, i.input_id, i.tipo
+    FROM perguntas AS p
+    INNER JOIN input AS i ON p.id_input = i.input_id
+    WHERE p.perguntas_id = $cod";
+
+   $resp = $conexao->query($sql);
+   $dados_pergun = [];
+
+   //print_r($resp);
+
+   if($resp->num_rows> 0){
+
+        while($dd = $resp->fetch_assoc()){
+            $dados_pergun[] = $dd;
         }
-    }
-    elseif($tipo == 8){
-        foreach($_POST as $nome => $valor){
-            if($nome != 'perguntaa' && $nome != 'tipo_input' &&  $nome != 'obrig' &&  $nome != 'check1' &&  $nome != 'rad1' &&  $nome != 'min' &&  $nome != 'max' && $nome != 'mult' ){
-                if($valor != ''){
-                    $sql = "INSERT INTO multiplo (valor, id_pergunta) VALUES ('$valor',$id_pergunta )";
-                    $conexao->query($sql);
-                }
+
+   }
+
+   if($dados_pergun[0]['id_input'] == 6 || $dados_pergun[0]['id_input'] == 7 || $dados_pergun[0]['id_input'] == 8 ){
+        $sql2 = "SELECT * FROM multiplo where id_pergunta = $cod";
+
+        $resp2 = $conexao->query($sql2);
+
+        $dados_pergun2 = [];
+
+        if($resp2->num_rows>0){
+            while($multi = $resp2->fetch_assoc()){
+                $dados_pergun2[] = $multi;
             }
+
+           $dados_pergun[] = $dados_pergun2;
+            
         }
-    }
+       
+   }
 
+   $dados_pergunta = json_encode($dados_pergun);
 
-    $conexao->commit();
-    header("Location: ".$_SERVER['PHP_SELF']);
+   echo $dados_pergunta;
+
+    exit;
 }
-
-catch (Exception){
-    $conexao->rollback();
-}
-
-
-
-}
-
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -89,7 +128,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     ';
     $lista_perguntas = $conexao->query($sql);
+
 }
+
 
 
 ?>
@@ -105,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>formulario</title>
     <link rel="stylesheet" href="./style/estilo.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/fontawesome.min.css" integrity="sha512-UuQ/zJlbMVAw/UU8vVBhnI4op+/tFOpQZVT+FormmIEhRSCnJWyHiBbEVgM4Uztsht41f3FzVWgLuwzUqOObKw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 
@@ -149,17 +190,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                     <div class="pai_multi">
                         <input type="radio" disabled>
-                        <input type="text" name="rad1" id="rad1" placeholder="Digite a opção..." >
+                        <input type="text" name="rad1" id="rad1" placeholder="Digite a opção...">
                     </div>
 
                     <div class="pai_check">
                         <input type="checkbox" disabled>
-                        <input type="text" name="check1" id="check1" placeholder="Digite a opção..." >
+                        <input type="text" name="check1" id="check1" placeholder="Digite a opção...">
                     </div>
 
                     <div class="pai_select">
                         <p>1 - </p>
-                        <input type="text" name="select1" id="select1" placeholder="Digite a opção..." >
+                        <input type="text" name="select1" id="select1" placeholder="Digite a opção...">
                     </div>
 
 
@@ -217,12 +258,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
     <div class="tabelas container">
-    
-    <?php
+
+        <?php
         if ($lista_perguntas->num_rows > 0) {
-            echo '<h2>'. 'Lista de perguntas' .'</h2>';
+            echo '<h2>' . 'Lista de perguntas' . '</h2>';
             echo '<table>';
             echo '<tr>';
+            echo '<th>#</th>';
             echo '<th>Pergunta</th>';
             echo '<th>Tipo</th>';
             echo '<th>Resposta multipla</th>';
@@ -236,26 +278,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 // print_r($perg);
 
                 // die();
-    
-                echo '<tr>';
+
+                echo '<tr class="linha_perg">';
+                echo '<td class="valor_perg">' . $perg['perguntas_id'] . '</td>';
                 echo '<td>' . $perg['titulo'] . '</td>';
                 echo '<td>' . $perg['tipo'] . '</td>';
                 echo '<td>' . $perg['multiplo_res']  . '</td>';
                 echo '<td>' . $perg['obrigatorio']  . '</td>';
-                echo '<td>' . ($perg['min_caract']== 0 ? 'Não possui': $perg['obrigatorio']) . '</td>';
-                echo '<td>' . ($perg['max_caract']== 0 ? 'Não possui': $perg['obrigatorio']). '</td>';
+                echo '<td>' . ($perg['min_caract'] == 0 ? 'Não possui' : $perg['obrigatorio']) . '</td>';
+                echo '<td>' . ($perg['max_caract'] == 0 ? 'Não possui' : $perg['obrigatorio']) . '</td>';
+                echo '<td>' . '<i class="fa-solid fa-pen-to-square edit open-modal" ></i>' . '</td>';
                 echo '</tr>';
             }
 
             echo '</table>';
-        }else{
-            echo '<h2>'. 'Crie suas perguntas' .'</h2>';
+        } else {
+            echo '<h2>' . 'Crie suas perguntas' . '</h2>';
         }
         ?>
 
 
     </div>
 
+
+    <!--  Modal -->
+    <div id="fade" class="hide"></div>
+    <div id="modal" class="hide">
+        <div class="modal-header">
+            <h2>Este é o Modal</h2>
+            <button id="close-modal">Fechar</button>
+        </div>
+
+        <div class="modal-body">
+
+       
+
+        </div>
+    </div>
+    <!-- FIM Modal -->
 
 
     <script>
@@ -308,38 +368,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 if (valor_input == 6 || valor_input == 7 || valor_input == 8) {
                     $('.dados_input').css('display', 'block')
 
-                    if(valor_input == 6){
+                    if (valor_input == 6) {
                         $('.pai_multi').css('display', 'block')
                         $('.pai_multi').find('#rad1').attr('required', true)
 
                         $('.pai_check').css('display', 'none')
                         $('.pai_select').css('display', 'none')
-                    }else{
+                    } else {
                         $('.pai_multi').css('display', 'none')
                         $('.pai_multi').find('#rad1').attr('required', false)
                     }
 
 
-                    if(valor_input == 7){
+                    if (valor_input == 7) {
                         $('.pai_check').css('display', 'block')
                         $('.pai_check').find('#check1').attr('required', true)
 
                         $('.pai_multi').css('display', 'none')
                         $('.pai_select').css('display', 'none')
-                    }else{
+                    } else {
                         $('.pai_check').css('display', 'none')
                         $('.pai_check').find('#check1').attr('required', false)
                     }
 
 
 
-                    if(valor_input == 8){
+                    if (valor_input == 8) {
                         $('.pai_select').css('display', 'block')
                         $('.pai_select').find('#select1').attr('required', true)
 
                         $('.pai_multi').css('display', 'none')
                         $('.pai_check').css('display', 'none')
-                    }else{
+                    } else {
                         $('.pai_select').css('display', 'none')
                         $('.pai_select').find('#select1').attr('required', false)
                     }
@@ -349,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     $('.dados_input').css('display', 'none')
                     $('.pai_multi').find('#rad1').attr('required', false)
                     $('.pai_check').find('#check1').attr('required', false)
-                    $('.pai_select').find ('#select1').attr('required', false)
+                    $('.pai_select').find('#select1').attr('required', false)
                 }
 
 
@@ -405,9 +465,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     div_input_mult.appendChild(text)
 
                     cont++
-                }
-                else if (valor_input == 8) {
-                    
+                } else if (valor_input == 8) {
+
                     e.preventDefault();
 
                     let div_input_select = document.querySelector('.pai_select');
@@ -420,7 +479,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     text.type = 'text'
                     text.name = 'select' + cont
                     text.placeholder = 'Digite a opção...'
-                   
+
 
                     div_input_select.appendChild(p)
                     div_input_select.appendChild(text)
@@ -430,6 +489,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
 
             });
+
+
+            // MODAL
+            //const openModalButton = document.querySelector("#open-modal");
+            const closeModalButton = document.querySelector("#close-modal");
+            const modal = document.querySelector("#modal");
+            const fade = document.querySelector("#fade");
+
+            const toggleModal = () => {
+                modal.classList.toggle("hide");
+                fade.classList.toggle("hide");
+            };
+
+            $('.open-modal').click(function(){
+                let cod_per = $(this).closest('.linha_perg').find('.valor_perg').text()
+                
+                toggleModal()
+
+                $.ajax({
+                    url: 'index.php',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {cod_pergunta : cod_per},
+                    success: function(res){
+                        
+                        console.log(res)
+                    }
+                })
+
+
+            })
+
+
+            // [closeModalButton, fade].forEach((el) => {
+            //     el.addEventListener("click", () => toggleModal());
+            // });
 
         })
     </script>
