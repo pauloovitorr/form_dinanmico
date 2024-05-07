@@ -311,7 +311,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         <div class="modal-body">
 
-       
+        <div class="pai_perguntas">
+
+                <div>
+                    <label for="perguntaa">Digite sua pergunta</label> <br>
+                    <input type="text" name="perguntaa" id="perguntaaa" minlength="3" required>
+                </div>
+
+
+<!-- Paulo -->
+                <div>
+
+                    <label for="inputt">Tipo de input</label> <br>
+                    <select name="tipo_input" id="inputty" required>
+
+                        <option value=""></option>
+                        <option value="1">Resposta curta</option>
+                        <option value="2">Parágrafo</option>
+                        <option value="3">Número</option>
+                        <option value="4">Data</option>
+                        <option value="5">Upload de arquivos</option>
+                        <option value="6">Escolha única</option>
+                        <option value="7">Caixa de seleção</option>
+                        <option value="8">Lista suspensa</option>
+
+                    </select>
+
+                </div>
+
+                <div class="dados_inputt">
+                
+                </div>
+
+                <button id="add"> <i class="fa-solid fa-plus"></i> Adicionar</button>
+
+            </div>
 
         </div>
     </div>
@@ -513,13 +547,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     dataType: 'json',
                     data: {cod_pergunta : cod_per},
                     success: function(res){
-                        
+
                         console.log(res)
+                        
+                        $('#perguntaaa').val(res[0].titulo)
+                        $('#inputty').val(res[0].id_input)
+
+                        if(res[1] != 0){
+                            
+
+                            let div_container = document.querySelector('.dados_inputt')
+
+                            let filho = div_container.querySelector('.input_radio')
+
+                            if(!filho){
+                                for(let i of res[1]){
+
+                                    div = document.createElement('div')
+                                    div.classList = 'input_radio'
+
+                                    if(res[0].tipo == 'radio' || res[0].tipo == 'checkbox'){
+                                    let input = document.createElement('input')
+                                    input.type = res[0].tipo
+                                    input.disabled = true
+                                    
+
+                                    let input_text = document.createElement('input')
+                                    input_text.type = 'text'
+                                    input_text.value = i.valor
+
+                                    div.appendChild(input)
+                                    div.appendChild(input_text)
+                                    
+                                    }
+                                    div_container.appendChild(div)
+                                    }
+                            }
+                            
+
+                        }
+                        
                     }
                 })
 
 
             })
+
+            $("#close-modal").click(function(){
+                toggleModal()
+            })
+
+            $("#fade").click(function(){
+                toggleModal()
+            })
+                
+           
 
 
             // [closeModalButton, fade].forEach((el) => {

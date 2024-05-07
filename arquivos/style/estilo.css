@@ -219,5 +219,31 @@ h1{
     color: rgb(12, 196, 52);
   }
 
+  .dados_inputt div{
+    display: flex;
+    justify-content: space-around;
+    width: 90%;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 15px;
+   
+  }
+
+  .input_radio input[type='radio'] {
+    width: 20px !important;
+  }
+
+  .input_radio input[type='checkbox'] {
+    width: 20px !important;
+  }
+
+  .input_radio input[type='text'] {
+    border: none;
+    border-bottom: 1px solid rgb(0, 191, 255);
+    outline: none;
+  }
+
+
+
 
 
