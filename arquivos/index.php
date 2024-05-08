@@ -323,7 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 <div>
 
                     <label for="inputt">Tipo de input</label> <br>
-                    <select name="tipo_input" id="inputty" required>
+                    <select name="tipo_input" class="innputt" id="inputty" required>
 
                         <option value=""></option>
                         <option value="1">Resposta curta</option>
@@ -550,7 +550,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     data: {cod_pergunta : cod_per},
                     success: function(res){
 
-                        console.log(res[0].max_caract)
+                        //console.log(res[0].max_caract)
                         
                         $('#perguntaaa').val(res[0].titulo)
                         $('#inputty').val(res[0].id_input)
@@ -559,7 +559,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                         if(res[1] != 0 &&  res[1] != undefined){
                             
-
+                            div_container.innerHTML = ''
                             
 
                             
@@ -612,6 +612,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         }
                         else{
 
+                        let obrig = `<div class="listaa">
+
+                        <div>
+                            <label for="">Deve ser obrigatório responder?</label>
+                            <input type="radio" id="obg_s" name="obrig" value="Sim" required> <label for="obg_s">Sim</label>
+                            <input type="radio" id="obg_n" name="obrig" value="Não" required> <label for="obg_n">Não</label>
+                        </div>
+
+
+                            </div>`
+
                          let tt =  ` <div class="config_caracteres">
 
                                 <div>
@@ -626,7 +637,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                                 </div>`
 
-                                div_container.innerHTML = tt
+                                div_container.innerHTML = obrig
+                                div_container.innerHTML += tt
 
                         }
 
@@ -649,19 +661,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
            
 
 
+
+            $('.innputt').on('input', function(){
+               let valor = $(this).val()
+               
+                let cont = 0
+
+               if (valor == 6) {
+                document.querySelector('.dados_inputt').innerHTML = ''
+
+                } else if (valor == 7) {
+                    document.querySelector('.dados_inputt').innerHTML = ''
+                    
+                } else if (valor == 8) {
+                    document.querySelector('.dados_inputt').innerHTML = ''
+
+                }
+                else{
+
+                    document.querySelector('.dados_inputt').innerHTML = `<div class="listaa">
+                                                                    <div>
+                                                                        <label for="">Deve ser obrigatório responder?</label>
+                                                                        <input type="radio" id="obg_s" name="obrig" value="Sim" required> <label for="obg_s">Sim</label>
+                                                                        <input type="radio" id="obg_n" name="obrig" value="Não" required> <label for="obg_n">Não</label>
+                                                                    </div>
+
+                                                                        </div>`
+                
+                }
+
+            
+
+            })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             $('#addd').click(function(e) {
 
                 e.preventDefault();
 
-let valor_input = $('#inputty').val()
+    let valor_input = $('#inputty').val()
 
 
-var paragrafos = document.querySelectorAll('.p_ordem');
+    var paragrafos = document.querySelectorAll('.p_ordem');
 
-    var ultimoParagrafo = paragrafos[paragrafos.length - 1].textContent;
-    ultimoParagrafo = ultimoParagrafo.split('')
+    if(paragrafos.length > 0){
+        var ultimoParagrafo = paragrafos[paragrafos.length - 1].textContent;
+        ultimoParagrafo = ultimoParagrafo.split('')
 
-    ultimoParagrafo = parseInt(ultimoParagrafo) + 1
+        ultimoParagrafo = parseInt(ultimoParagrafo) + 1
+        
+    }
+
+    
 
 
 if (valor_input == 6) {
@@ -720,11 +784,6 @@ if (valor_input == 6) {
 
     
 
-
-
-    let p = document.createElement('p')
-    p.classList = 'p_ordem'
-    p.innerHTML = ultimoParagrafo + '  -'
 
 
     let text = document.createElement('input')

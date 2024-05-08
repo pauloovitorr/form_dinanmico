@@ -243,6 +243,13 @@ h1{
     outline: none;
   }
 
+  .listaa{
+    
+  }
+
+  .listaa input[type='radio']{
+    width: 8%;
+  }
 
 
 
