@@ -78,7 +78,7 @@ body{
 }
 
 .dados_input div{
-    width: 75%;
+    width: 70%;
 
     padding: 5px;
     margin: 0;
@@ -92,19 +92,19 @@ body{
     border: none;
     border-bottom: 1px solid rgb(0, 191, 255);
     outline: none;
-    width: 90%;
+    width: 95%;
 }
 
 .dados_input div input[type=radio]{
     border: none;
     outline: none;
-    width: 6%;
+    width: 3%;
 }
 
 .dados_input div input[type=checkbox]{
     border: none;
     outline: none;
-    width: 6%;
+    width: 3%;
 }
 
 .dados_input div p{

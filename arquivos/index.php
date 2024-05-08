@@ -199,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     </div>
 
                     <div class="pai_select">
-                        <p>1 - </p>
+                        <p>1-</p>
                         <input type="text" name="select1" id="select1" placeholder="Digite a opção...">
                     </div>
 
@@ -267,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo '<th>#</th>';
             echo '<th>Pergunta</th>';
             echo '<th>Tipo</th>';
-            echo '<th>Resposta multipla</th>';
+            echo '<th>Lista</th>';
             echo '<th>Obrigatório</th>';
             echo '<th>Mín caracteres</th>';
             echo '<th>Máx caracteres</th>';
@@ -343,7 +343,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 
                 </div>
 
-                <button id="add"> <i class="fa-solid fa-plus"></i> Adicionar</button>
+                <div>
+                    <button id="addd"> <i class="fa-solid fa-plus"></i> Adicionar</button>
+                </div>
 
             </div>
 
@@ -506,7 +508,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     let div_input_select = document.querySelector('.pai_select');
 
                     let p = document.createElement('p')
-                    p.innerHTML = contador + '  -'
+                    p.innerHTML = contador + '  -  '
 
 
                     let text = document.createElement('input')
@@ -548,15 +550,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     data: {cod_pergunta : cod_per},
                     success: function(res){
 
-                        console.log(res)
+                        console.log(res[0].max_caract)
                         
                         $('#perguntaaa').val(res[0].titulo)
                         $('#inputty').val(res[0].id_input)
 
-                        if(res[1] != 0){
+                        let div_container = document.querySelector('.dados_inputt')
+
+                        if(res[1] != 0 &&  res[1] != undefined){
                             
 
-                            let div_container = document.querySelector('.dados_inputt')
+                            
 
                             
                             let filho = div_container.querySelectorAll('.input_radio')
@@ -568,7 +572,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                 });
 
                 
-
+                                let conta = 1
                                 for(let i of res[1]){
 
                                     div = document.createElement('div')
@@ -588,12 +592,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                     div.appendChild(input_text)
                                     
                                     }
-                                    div_container.appendChild(div)
+                                    else if(res[0].tipo == 'select'){
+
+                                        let input_select = document.createElement('input')
+                                        input_select.type = 'text'
+                                        input_select.value = i.valor
+
+                                        let p = document.createElement('p')
+                                        p.classList = 'p_ordem'
+                                        p.innerHTML = conta + ' - '
+
+                                        div.appendChild(p)
+                                        div.appendChild(input_select)
                                     }
-                            
-                            
+
+                                    div_container.appendChild(div)
+                                    conta++
+                                    }   
+                        }
+                        else{
+
+                         let tt =  ` <div class="config_caracteres">
+
+                                <div>
+                                    <label for="">Mínimo de caracteres?</label>
+                                    <input type="number" id="minnn" name="min" min="${res[0].min_caract}" max="${parseInt(res[0].min_caract) +10}"  value= "${res[0].min_caract}"   >
+                                </div>
+
+                                <div>
+                                    <label for="">Máximo de caracteres?</label>
+                                    <input type="number" id="maxxx" name="max" min="${parseInt(res[0].min_caract) + 11}"  max="${res[0].max_caract}" value= "${res[0].max_caract}">
+                                </div>
+
+                                </div>`
+
+                                div_container.innerHTML = tt
 
                         }
+
+
                         
                     }
                 })
@@ -612,10 +649,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
            
 
 
-            // [closeModalButton, fade].forEach((el) => {
-            //     el.addEventListener("click", () => toggleModal());
-            // });
+            $('#addd').click(function(e) {
 
+                e.preventDefault();
+
+let valor_input = $('#inputty').val()
+
+
+var paragrafos = document.querySelectorAll('.p_ordem');
+
+    var ultimoParagrafo = paragrafos[paragrafos.length - 1].textContent;
+    ultimoParagrafo = ultimoParagrafo.split('')
+
+    ultimoParagrafo = parseInt(ultimoParagrafo) + 1
+
+
+if (valor_input == 6) {
+   
+
+    let div_input_mult = document.querySelector('.dados_inputt');
+    let divv = document.createElement('div')
+    divv.classList = 'input_radio'
+
+    let radio = document.createElement('input')
+    radio.type = 'radio'
+    radio.disabled = true
+
+
+    let text = document.createElement('input')
+    text.type = 'text'
+    text.name = 'rad' + cont
+    text.placeholder = 'Digite a opção...'
+    text.required = true
+
+    divv.appendChild(radio)
+    divv.appendChild(text)
+
+    div_input_mult.appendChild(divv)
+
+    cont++
+} else if (valor_input == 7) {
+    
+   
+    let div_input_mult = document.querySelector('.dados_inputt');
+    let divv = document.createElement('div')
+    divv.classList = 'input_radio'
+
+    let check = document.createElement('input')
+    check.type = 'checkbox'
+    check.disabled = true
+
+
+    let text = document.createElement('input')
+    text.type = 'text'
+    text.name = 'check' + cont
+    text.placeholder = 'Digite a opção...'
+    //text.required = true
+
+    divv.appendChild(check)
+    divv.appendChild(text)
+
+    div_input_mult.appendChild(divv)
+
+    cont++
+} else if (valor_input == 8) {
+
+    let div_input_mult = document.querySelector('.dados_inputt');
+    let divv = document.createElement('div')
+    divv.classList = 'input_radio'
+
+    
+
+
+
+    let p = document.createElement('p')
+    p.classList = 'p_ordem'
+    p.innerHTML = ultimoParagrafo + '  -'
+
+
+    let text = document.createElement('input')
+    text.type = 'text'
+    text.name = 'select' + cont
+    text.placeholder = 'Digite a opção...'
+
+
+   divv.appendChild(p)
+   divv.appendChild(text)
+
+   div_input_mult.appendChild(divv)
+
+    cont++
+    contador++
+    ultimoParagrafo++
+}
+
+});
         })
     </script>
 
