@@ -82,40 +82,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['cod_pergunta'])) {
     INNER JOIN input AS i ON p.id_input = i.input_id
     WHERE p.perguntas_id = $cod";
 
-   $resp = $conexao->query($sql);
-   $dados_pergun = [];
+    $resp = $conexao->query($sql);
+    $dados_pergun = [];
 
-   //print_r($resp);
+    //print_r($resp);
 
-   if($resp->num_rows> 0){
+    if ($resp->num_rows > 0) {
 
-        while($dd = $resp->fetch_assoc()){
+        while ($dd = $resp->fetch_assoc()) {
             $dados_pergun[] = $dd;
         }
+    }
 
-   }
-
-   if($dados_pergun[0]['id_input'] == 6 || $dados_pergun[0]['id_input'] == 7 || $dados_pergun[0]['id_input'] == 8 ){
+    if ($dados_pergun[0]['id_input'] == 6 || $dados_pergun[0]['id_input'] == 7 || $dados_pergun[0]['id_input'] == 8) {
         $sql2 = "SELECT * FROM multiplo where id_pergunta = $cod";
 
         $resp2 = $conexao->query($sql2);
 
         $dados_pergun2 = [];
 
-        if($resp2->num_rows>0){
-            while($multi = $resp2->fetch_assoc()){
+        if ($resp2->num_rows > 0) {
+            while ($multi = $resp2->fetch_assoc()) {
                 $dados_pergun2[] = $multi;
             }
 
-           $dados_pergun[] = $dados_pergun2;
-            
+            $dados_pergun[] = $dados_pergun2;
         }
-       
-   }
+    }
 
-   $dados_pergunta = json_encode($dados_pergun);
+    $dados_pergunta = json_encode($dados_pergun);
 
-   echo $dados_pergunta;
+    echo $dados_pergunta;
 
     exit;
 }
@@ -128,7 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     ';
     $lista_perguntas = $conexao->query($sql);
-
 }
 
 
@@ -147,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <title>formulario</title>
     <link rel="stylesheet" href="./style/estilo.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 
@@ -311,7 +308,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         <div class="modal-body">
 
-        <div class="pai_perguntas">
+            <div class="pai_perguntas">
 
                 <div>
                     <label for="perguntaa">Digite sua pergunta</label> <br>
@@ -319,18 +316,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 </div>
 
 
-<!-- Paulo -->
+                <!-- Paulo -->
                 <div>
 
                     <label for="inputt">Tipo de input</label> <br>
                     <select name="tipo_input" class="innputt" id="inputty" required>
 
                         <option value=""></option>
-                        <option value="1">Resposta curta</option>
-                        <option value="2">Parágrafo</option>
-                        <option value="3">Número</option>
-                        <option value="4">Data</option>
-                        <option value="5">Upload de arquivos</option>
+                        <option class="simples" value="1">Resposta curta</option>
+                        <option class="simples" value="2">Parágrafo</option>
+                        <option class="simples" value="3">Número</option>
+                        <option class="simples" value="4">Data</option>
+                        <option class="simples" value="5">Upload de arquivos</option>
                         <option value="6">Escolha única</option>
                         <option value="7">Caixa de seleção</option>
                         <option value="8">Lista suspensa</option>
@@ -340,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 </div>
 
                 <div class="dados_inputt">
-                
+
                 </div>
 
                 <div>
@@ -527,8 +524,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             });
 
 
-            // MODAL
-            //const openModalButton = document.querySelector("#open-modal");
+            let dados_bd = ''
             const closeModalButton = document.querySelector("#close-modal");
             const modal = document.querySelector("#modal");
             const fade = document.querySelector("#fade");
@@ -538,159 +534,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 fade.classList.toggle("hide");
             };
 
-            $('.open-modal').click(function(){
+            $('.open-modal').click(function() {
                 let cod_per = $(this).closest('.linha_perg').find('.valor_perg').text()
-                
+
                 toggleModal()
 
                 $.ajax({
                     url: 'index.php',
                     method: 'POST',
                     dataType: 'json',
-                    data: {cod_pergunta : cod_per},
-                    success: function(res){
+                    data: {
+                        cod_pergunta: cod_per
+                    },
+                    success: function(res) {
 
-                        //console.log(res[0].max_caract)
-                        
-                        $('#perguntaaa').val(res[0].titulo)
-                        $('#inputty').val(res[0].id_input)
+                        dados_bd = res
 
-                        let div_container = document.querySelector('.dados_inputt')
+                        manipula_pop(dados_bd)
 
-                        if(res[1] != 0 &&  res[1] != undefined){
-                            
-                            div_container.innerHTML = ''
-                            
-
-                            
-                            let filho = div_container.querySelectorAll('.input_radio')
-
-                            
-
-                                filho.forEach(function(elemento) {
-                                    elemento.parentNode.removeChild(elemento);
-                                });
-
-                
-                                let conta = 1
-                                for(let i of res[1]){
-
-                                    div = document.createElement('div')
-                                    div.classList = 'input_radio'
-
-                                    if(res[0].tipo == 'radio' || res[0].tipo == 'checkbox'){
-                                    let input = document.createElement('input')
-                                    input.type = res[0].tipo
-                                    input.disabled = true
-                                    
-
-                                    let input_text = document.createElement('input')
-                                    input_text.type = 'text'
-                                    input_text.value = i.valor
-
-                                    div.appendChild(input)
-                                    div.appendChild(input_text)
-                                    
-                                    }
-                                    else if(res[0].tipo == 'select'){
-
-                                        let input_select = document.createElement('input')
-                                        input_select.type = 'text'
-                                        input_select.value = i.valor
-
-                                        let p = document.createElement('p')
-                                        p.classList = 'p_ordem'
-                                        p.innerHTML = conta + ' - '
-
-                                        div.appendChild(p)
-                                        div.appendChild(input_select)
-                                    }
-
-                                    div_container.appendChild(div)
-                                    conta++
-                                    }   
-                        }
-                        else{
-
-                        let obrig = `<div class="listaa">
-
-                        <div>
-                            <label for="">Deve ser obrigatório responder?</label>
-                            <input type="radio" id="obg_s" name="obrig" value="Sim" required> <label for="obg_s">Sim</label>
-                            <input type="radio" id="obg_n" name="obrig" value="Não" required> <label for="obg_n">Não</label>
-                        </div>
-
-
-                            </div>`
-
-                         let tt =  ` <div class="config_caracteres">
-
-                                <div>
-                                    <label for="">Mínimo de caracteres?</label>
-                                    <input type="number" id="minnn" name="min" min="${res[0].min_caract}" max="${parseInt(res[0].min_caract) +10}"  value= "${res[0].min_caract}"   >
-                                </div>
-
-                                <div>
-                                    <label for="">Máximo de caracteres?</label>
-                                    <input type="number" id="maxxx" name="max" min="${parseInt(res[0].min_caract) + 11}"  max="${res[0].max_caract}" value= "${res[0].max_caract}">
-                                </div>
-
-                                </div>`
-
-                                div_container.innerHTML = obrig
-                                div_container.innerHTML += tt
-
+                        if(dados_bd[0].tipo == 'radio' || dados_bd[0].tipo == 'select' || dados_bd[0].tipo == 'checkbox' ){
+                            Swal.fire("Atenção, a pergunta selecionada para edição é de multipla escolhas, não é possível alterar para outro tipo!");
                         }
 
-
-                        
                     }
                 })
 
 
             })
 
-            $("#close-modal").click(function(){
+            $("#close-modal").click(function() {
                 toggleModal()
             })
 
-            $("#fade").click(function(){
+            $("#fade").click(function() {
                 toggleModal()
             })
-                
-           
 
 
+            $('.innputt').on('input', function() {
+                let valor = $(this).val()
 
-            $('.innputt').on('input', function(){
-               let valor = $(this).val()
-               
+                //console.log(valor)
+
                 let cont = 0
 
-               if (valor == 6) {
-                document.querySelector('.dados_inputt').innerHTML = ''
+                if (valor == 6) {
+                    document.querySelector('.dados_inputt').innerHTML = ''
+                    document.querySelector('.dados_inputt').innerHTML = `<div class="listaa">
+
+<div>
+<label for="">Deve ser obrigatório responder?</label>
+<input type="radio" id="obg_s" name="obrig" value="Sim" required> <label for="obg_s">Sim</label>
+<input type="radio" id="obg_n" name="obrig" value="Não" required> <label for="obg_n">Não</label>
+</div>
+
+
+</div>`
+
+
+                    dados_bd[0].tipo = 'radio'
+
+                    dados_bd[0].id_input = valor
+
+                    // console.log(valor)
+
+                    manipula_pop(dados_bd)
 
                 } else if (valor == 7) {
+
                     document.querySelector('.dados_inputt').innerHTML = ''
-                    
+
+
+                    dados_bd[0].tipo = 'checkbox'
+                    dados_bd[0].id_input = valor
+
+                    manipula_pop(dados_bd)
+
                 } else if (valor == 8) {
                     document.querySelector('.dados_inputt').innerHTML = ''
 
+                    dados_bd[0].tipo = 'select'
+                    dados_bd[0].id_input = valor
+
+                    manipula_pop(dados_bd)
+
+                } else {
+
+                    if (valor == 1 || valor == 2) {
+
+                        dados_bd[0].tipo = 'text'
+                        dados_bd[0].id_input = valor
+                        manipula_pop(dados_bd)
+
+                    } else if (valor == 3 || valor == 4 || valor == 5) {
+
+                        dados_bd[0].tipo = 'pula'
+                        dados_bd[0].id_input = valor
+                        manipula_pop(dados_bd)
+
+                    }
+
+
+
+
+
                 }
-                else{
 
-                    document.querySelector('.dados_inputt').innerHTML = `<div class="listaa">
-                                                                    <div>
-                                                                        <label for="">Deve ser obrigatório responder?</label>
-                                                                        <input type="radio" id="obg_s" name="obrig" value="Sim" required> <label for="obg_s">Sim</label>
-                                                                        <input type="radio" id="obg_n" name="obrig" value="Não" required> <label for="obg_n">Não</label>
-                                                                    </div>
 
-                                                                        </div>`
-                
-                }
-
-            
 
             })
 
@@ -698,7 +648,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 
+            function manipula_pop(res) {
 
+
+                document.querySelector('.dados_inputt').innerHTML = ''
+
+                $('#perguntaaa').val(res[0].titulo)
+                $('#inputty').val(res[0].id_input)
+
+
+                console.log(res)
+
+                let div_container = document.querySelector('.dados_inputt')
+
+                div_container.innerHTML = `<div class="listaa">
+
+<div>
+<label for="">Deve ser obrigatório responder?</label>
+<input type="radio" id="obg_s" name="obrig" value="Sim" required> <label for="obg_s">Sim</label>
+<input type="radio" id="obg_n" name="obrig" value="Não" required> <label for="obg_n">Não</label>
+</div>
+
+
+</div>`
+
+                if (res[1] != 0 && res[1] !== undefined) {
+
+                    $('.simples').attr('disabled', true)
+
+                   
+
+
+                    let filho = div_container.querySelectorAll('.input_radio')
+
+                    filho.forEach(function(elemento) {
+                        elemento.parentNode.removeChild(elemento);
+                    });
+
+
+
+                    for (let i of res[1]) {
+
+                        div = document.createElement('div')
+                        div.classList = 'input_radio'
+
+
+
+                        if (res[0].tipo == 'radio' || res[0].tipo == 'checkbox') {
+                            let input = document.createElement('input')
+                            input.type = res[0].tipo
+                            input.disabled = true
+
+
+
+
+                            let input_text = document.createElement('input')
+                            input_text.type = 'text'
+                            input_text.value = i.valor
+
+                            div.appendChild(input)
+                            div.appendChild(input_text)
+
+                        } else if (res[0].tipo == 'select') {
+
+                            let input_select = document.createElement('input')
+                            input_select.type = 'text'
+                            input_select.value = i.valor
+
+
+                            div.appendChild(input_select)
+                        }
+
+                        div_container.appendChild(div)
+
+                    }
+                } else if (res[0].tipo == 'text') {
+
+                    $('.simples').attr('disabled', false)
+
+
+                    let tt = ` <div class="config_caracteres">
+
+    <div>
+        <label for="">Mínimo de caracteres?</label>
+        <input type="number" id="minnn" name="min" min="${res[0].min_caract}" max="${parseInt(res[0].min_caract) +10}"  value= "${res[0].min_caract}"   >
+    </div>
+
+    <div>
+        <label for="">Máximo de caracteres?</label>
+        <input type="number" id="maxxx" name="max" min="${parseInt(res[0].min_caract) + 11}"  max="${res[0].max_caract}" value= "${res[0].max_caract}">
+    </div>
+
+    </div>`
+
+                    
+                    div_container.innerHTML += tt
+
+                } 
+            }
 
 
 
@@ -712,97 +759,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                 e.preventDefault();
 
-    let valor_input = $('#inputty').val()
+                let valor_input = $('#inputty').val()
 
 
-    var paragrafos = document.querySelectorAll('.p_ordem');
+                var paragrafos = document.querySelectorAll('.p_ordem');
 
-    if(paragrafos.length > 0){
-        var ultimoParagrafo = paragrafos[paragrafos.length - 1].textContent;
-        ultimoParagrafo = ultimoParagrafo.split('')
+                if (paragrafos.length > 0) {
+                    var ultimoParagrafo = paragrafos[paragrafos.length - 1].textContent;
+                    ultimoParagrafo = ultimoParagrafo.split('')
 
-        ultimoParagrafo = parseInt(ultimoParagrafo) + 1
-        
-    }
+                    ultimoParagrafo = parseInt(ultimoParagrafo) + 1
 
-    
-
-
-if (valor_input == 6) {
-   
-
-    let div_input_mult = document.querySelector('.dados_inputt');
-    let divv = document.createElement('div')
-    divv.classList = 'input_radio'
-
-    let radio = document.createElement('input')
-    radio.type = 'radio'
-    radio.disabled = true
-
-
-    let text = document.createElement('input')
-    text.type = 'text'
-    text.name = 'rad' + cont
-    text.placeholder = 'Digite a opção...'
-    text.required = true
-
-    divv.appendChild(radio)
-    divv.appendChild(text)
-
-    div_input_mult.appendChild(divv)
-
-    cont++
-} else if (valor_input == 7) {
-    
-   
-    let div_input_mult = document.querySelector('.dados_inputt');
-    let divv = document.createElement('div')
-    divv.classList = 'input_radio'
-
-    let check = document.createElement('input')
-    check.type = 'checkbox'
-    check.disabled = true
-
-
-    let text = document.createElement('input')
-    text.type = 'text'
-    text.name = 'check' + cont
-    text.placeholder = 'Digite a opção...'
-    //text.required = true
-
-    divv.appendChild(check)
-    divv.appendChild(text)
-
-    div_input_mult.appendChild(divv)
-
-    cont++
-} else if (valor_input == 8) {
-
-    let div_input_mult = document.querySelector('.dados_inputt');
-    let divv = document.createElement('div')
-    divv.classList = 'input_radio'
-
-    
+                }
 
 
 
-    let text = document.createElement('input')
-    text.type = 'text'
-    text.name = 'select' + cont
-    text.placeholder = 'Digite a opção...'
+
+                if (valor_input == 6) {
 
 
-   divv.appendChild(p)
-   divv.appendChild(text)
+                    let div_input_mult = document.querySelector('.dados_inputt');
+                    let divv = document.createElement('div')
+                    divv.classList = 'input_radio'
 
-   div_input_mult.appendChild(divv)
+                    let radio = document.createElement('input')
+                    radio.type = 'radio'
+                    radio.disabled = true
 
-    cont++
-    contador++
-    ultimoParagrafo++
-}
 
-});
+                    let text = document.createElement('input')
+                    text.type = 'text'
+                    text.name = 'rad' + cont
+                    text.placeholder = 'Digite a opção...'
+                    text.required = true
+
+                    divv.appendChild(radio)
+                    divv.appendChild(text)
+
+                    div_input_mult.appendChild(divv)
+
+                    cont++
+                } else if (valor_input == 7) {
+
+
+                    let div_input_mult = document.querySelector('.dados_inputt');
+                    let divv = document.createElement('div')
+                    divv.classList = 'input_radio'
+
+                    let check = document.createElement('input')
+                    check.type = 'checkbox'
+                    check.disabled = true
+
+
+                    let text = document.createElement('input')
+                    text.type = 'text'
+                    text.name = 'check' + cont
+                    text.placeholder = 'Digite a opção...'
+                    //text.required = true
+
+                    divv.appendChild(check)
+                    divv.appendChild(text)
+
+                    div_input_mult.appendChild(divv)
+
+                    cont++
+                } else if (valor_input == 8) {
+
+                    let div_input_mult = document.querySelector('.dados_inputt');
+                    let divv = document.createElement('div')
+                    divv.classList = 'input_radio'
+
+
+                    let text = document.createElement('input')
+                    text.type = 'text'
+                    text.name = 'select' + cont
+                    text.placeholder = 'Digite a opção...'
+
+
+
+                    divv.appendChild(text)
+
+                    div_input_mult.appendChild(divv)
+
+                    cont++
+                    contador++
+                    ultimoParagrafo++
+                }
+
+            });
         })
     </script>
 
