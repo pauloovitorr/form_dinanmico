@@ -12,6 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !emp
     $max      = '';
     $multiplo_res = 'Não';
 
+
+
+
+
     $conexao->begin_transaction();
     try {
 
@@ -68,6 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['perguntaa']) && !emp
 
         $conexao->commit();
         header("Location: " . $_SERVER['PHP_SELF']);
+
+        
     } catch (Exception) {
         $conexao->rollback();
     }
